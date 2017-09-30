@@ -1,6 +1,7 @@
 package com.blackwood3.driveroo;
 
 
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -19,11 +20,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback  {
 
     GoogleMap mGoogleMap;
     MapView mMapView;
     View mView;
+
+    LocationManager locationManager;
 
 
     public MapFragment() {
@@ -61,7 +64,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         LatLng sydney = new LatLng(-34, 151);
 
         mGoogleMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 10.2f));
 
     }
 }
