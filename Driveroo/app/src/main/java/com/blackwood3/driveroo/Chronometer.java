@@ -11,7 +11,7 @@ public class Chronometer implements Runnable {
     public static final long MILLIS_TO_MINS = 60000;
     public static final long MILLIS_TI_HOURS = 3600000;
 
-
+    //asdasasas
 
     private Context cContext;
     private long cStartTime;
