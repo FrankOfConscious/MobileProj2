@@ -3,8 +3,7 @@ package com.blackwood3.driveroo;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -15,20 +14,22 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
-import java.io.IOException;
-import java.util.List;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
 
     private GoogleMap mMap;
+    private ArrayList<LatLng> points;
+    Polyline line;
     LocationManager locationManager;
 
     TextView timeTv;
@@ -50,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        points = new ArrayList<LatLng>(); // initialize points
 
         mainContext = this;
 
@@ -93,7 +96,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -113,16 +118,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     LatLng latLng = new LatLng(latitude, longitude);
 
-                    Geocoder geocoder = new Geocoder(getApplicationContext());
-                    try {
-                        List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 1);
-                        String str = addressList.get(0).getLocality() + ", ";
-                        str += addressList.get(0).getCountryName();
-                        mMap.addMarker(new MarkerOptions().position(latLng).title(str));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.1f));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    points.add(latLng);
+
+                    redRawLine(mMap, points, latLng, line);
+
+//                    Geocoder geocoder = new Geocoder(getApplicationContext());
+//                    try {
+//                        List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 1);
+//                        String str = addressList.get(0).getLocality() + ", ";
+//                        str += addressList.get(0).getCountryName();
+//                        mMap.addMarker(new MarkerOptions().position(latLng).title(str));
+//                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.1f));
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
 
                 }
 
@@ -153,16 +162,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     LatLng latLng = new LatLng(latitude, longitude);
 
-                    Geocoder geocoder = new Geocoder(getApplicationContext());
-                    try {
-                        List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 1);
-                        String str = addressList.get(0).getLocality() + ", ";
-                        str += addressList.get(0).getCountryName();
-                        mMap.addMarker(new MarkerOptions().position(latLng).title(str));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.1f));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    points.add(latLng);
+
+                    redRawLine(mMap, points, latLng, line);
+//                    Geocoder geocoder = new Geocoder(getApplicationContext());
+//                    try {
+//                        List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 1);
+//                        String str = addressList.get(0).getLocality() + ", ";
+//                        str += addressList.get(0).getCountryName();
+//                        mMap.addMarker(new MarkerOptions().position(latLng).title(str));
+//                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.1f));
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
                 }
 
                 @Override
@@ -203,4 +215,31 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
 //        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 16.1f));
     }
+
+
+    private static void redRawLine(GoogleMap mMap, ArrayList<LatLng> points, LatLng currentLocation, Polyline line) {
+        mMap.clear(); // clear all markers and Polylines
+        PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
+
+        for (int i = 0; i < points.size(); i++) {
+            LatLng point = points.get(i);
+            options.add(point);
+        }
+
+        mMap.addMarker(new MarkerOptions().position(currentLocation)); // add marker at current position
+        line = mMap.addPolyline(options);
+    }
+
+//    private void redRawLine() {
+//        mMap.clear(); // clear all markers and Polylines
+//        PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
+//
+//        for (int i = 0; i < points.size(); i++) {
+//            LatLng point = points.get(i);
+//            options.add(point);
+//        }
+//
+//        mMap.addMarker(new MarkerOptions().position(latLng)); // add marker at current position
+//        line = mMap.addPolyline(options);
+//    }
 }
