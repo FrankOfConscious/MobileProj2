@@ -25,7 +25,7 @@ class face_detection:
             if person['car'] == self.car_number and person['face'] != "":
                 faceIds_owner.append(str(person['face']))
         bodys_detected = []
-        for pic_num in range(5):
+        for pic_num in range(3):
             pic = 'temp'+str(pic_num)+'.png'
             f = open(pic,'rb')
             body = f.read()
