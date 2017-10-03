@@ -42,6 +42,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Button startBtn2;
     Button endBtn;
 
+    private static LatLng previousLatlng;
+    private static float totalDistance = 0;
+
 
     // variables below are used for chronometer.
     Chronometer mChronometer;
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Context mainContext;
     Boolean chronoIsRunning;
 
+    private static final long INTERVAL_OND_SECOND = 1000;
 
 //    // variable below are used for setting minimum distance between 2 points where polyline will be
 //    // regenerated.
@@ -128,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, INTERVAL_OND_SECOND, 0, new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
                     double latitude = location.getLatitude();
@@ -139,6 +143,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     points.add(latLng);
 
                     redRawLine(mMap, points, latLng, line);
+
+                    if (previousLatlng == null) {
+
+                        previousLatlng = latLng;
+                    } else {
+
+                        String distanceText = "Distance: ";
+                        float[] resultDistance = new float[1];
+
+                        Location.distanceBetween(previousLatlng.latitude, previousLatlng.longitude,
+                                latLng.latitude, latLng.longitude, resultDistance);
+                        float tempDistance = resultDistance[0];
+                        totalDistance += tempDistance;
+
+                        distanceText += String.valueOf(totalDistance);
+                        distanceText += " m";
+                        disTv.setText(distanceText);
+
+                        previousLatlng = latLng;
+                    }
 
                     Geocoder geocoder = new Geocoder(getApplicationContext());
                     try {
@@ -172,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, INTERVAL_OND_SECOND, 0, new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
                     double latitude = location.getLatitude();
@@ -183,6 +207,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     points.add(latLng);
 
                     redRawLine(mMap, points, latLng, line);
+
+                    if (previousLatlng == null) {
+
+                        previousLatlng = latLng;
+                    } else {
+
+                        String distanceText = "Distance: ";
+                        float[] resultDistance = new float[1];
+
+                        Location.distanceBetween(previousLatlng.latitude, previousLatlng.longitude,
+                                latLng.latitude, latLng.longitude, resultDistance);
+                        float tempDistance = resultDistance[0];
+                        totalDistance += tempDistance;
+
+                        distanceText += String.valueOf(totalDistance);
+                        distanceText += " m";
+                        disTv.setText(distanceText);
+
+                        previousLatlng = latLng;
+                    }
+
                     Geocoder geocoder = new Geocoder(getApplicationContext());
                     try {
                         List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 1);
@@ -244,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             options.add(point);
         }
 
-        mMap.addMarker(new MarkerOptions().position(currentLocation)); // add marker at current position
+//        mMap.addMarker(new MarkerOptions().position(currentLocation)); // add marker at current position
         line = mMap.addPolyline(options);
     }
 
