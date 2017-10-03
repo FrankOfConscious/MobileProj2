@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -22,7 +25,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -135,16 +140,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     redRawLine(mMap, points, latLng, line);
 
-//                    Geocoder geocoder = new Geocoder(getApplicationContext());
-//                    try {
-//                        List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 1);
-//                        String str = addressList.get(0).getLocality() + ", ";
-//                        str += addressList.get(0).getCountryName();
-//                        mMap.addMarker(new MarkerOptions().position(latLng).title(str));
-//                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.1f));
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
+                    Geocoder geocoder = new Geocoder(getApplicationContext());
+                    try {
+                        List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 1);
+                        String str = addressList.get(0).getLocality() + ", ";
+                        str += addressList.get(0).getCountryName();
+                        mMap.addMarker(new MarkerOptions().position(latLng).title(str));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.1f));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
                 }
 
@@ -178,16 +183,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     points.add(latLng);
 
                     redRawLine(mMap, points, latLng, line);
-//                    Geocoder geocoder = new Geocoder(getApplicationContext());
-//                    try {
-//                        List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 1);
-//                        String str = addressList.get(0).getLocality() + ", ";
-//                        str += addressList.get(0).getCountryName();
-//                        mMap.addMarker(new MarkerOptions().position(latLng).title(str));
-//                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.1f));
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
+                    Geocoder geocoder = new Geocoder(getApplicationContext());
+                    try {
+                        List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 1);
+                        String str = addressList.get(0).getLocality() + ", ";
+                        str += addressList.get(0).getCountryName();
+                        mMap.addMarker(new MarkerOptions().position(latLng).title(str));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.1f));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
