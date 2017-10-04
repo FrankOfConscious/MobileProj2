@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -21,6 +22,15 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         new Thread(runnable).start();
+        TextView logOut=(TextView) findViewById(R.id.logout);
+        logOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent jumpToLogin=new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(jumpToLogin);
+                finish();
+            }
+        });
 
     }
 
@@ -42,8 +52,8 @@ public class ProfileActivity extends AppCompatActivity {
                     TextView name = (TextView) findViewById(R.id.profile_name);
                     TextView dob = (TextView) findViewById(R.id.profile_DOB);
                     TextView email = (TextView) findViewById(R.id.profile_Email);
-                    name.setText("Name: "+username);
-                    dob.setText("Car: "+Scar);
+                    name.setText("Name : "+username);
+                    dob.setText("Car  : "+Scar);
                     email.setText("Email: "+Semail);
 
                 } catch (JSONException e) {

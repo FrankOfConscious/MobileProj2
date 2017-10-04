@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         startBtn2 = (Button) findViewById(R.id.startBtn2);
         endBtn = (Button) findViewById(R.id.endBtn);
+        TextView testString=(TextView) findViewById(R.id.testString);
+        testString.setText("put String in this place and it will show on screen");
         chronoIsRunning = false;
 
         startBtn2.setOnClickListener(new View.OnClickListener() {
@@ -193,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
     }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {

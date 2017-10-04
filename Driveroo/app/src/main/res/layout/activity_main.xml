@@ -10,6 +10,13 @@
     tools:context="com.blackwood3.driveroo.MainActivity">
 
     <TextView
+        android:id="@+id/testString"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.2"
+        android:text="TextView" />
+
+    <TextView
         android:id="@+id/timeTv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
