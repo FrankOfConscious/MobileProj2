@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/road1_meitu_2"
+    android:background="@drawable/road1_meitu_2_meitu_3"
     android:orientation="vertical"
     android:weightSum="2.8"
     tools:context="com.blackwood3.driveroo.MainActivity">
@@ -16,7 +16,7 @@
         android:layout_weight="0.2"
         android:fontFamily="monospace"
         android:text="Time:"
-        android:textColor="?attr/colorPrimaryDark"
+        android:textColor="@color/colorPrimaryDark"
         android:textSize="24sp"
         android:textStyle="bold" />
 
@@ -27,7 +27,7 @@
         android:layout_weight="0.2"
         android:fontFamily="monospace"
         android:text="Distance:"
-        android:textColor="?attr/colorPrimaryDark"
+        android:textColor="@color/colorPrimaryDark"
         android:textSize="24sp"
         android:textStyle="bold" />
 
