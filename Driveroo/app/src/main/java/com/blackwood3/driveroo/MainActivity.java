@@ -2,6 +2,7 @@ package com.blackwood3.driveroo;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -9,8 +10,12 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -22,13 +27,22 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
 
     private GoogleMap mMap;
+    private Handler handler;
     LocationManager locationManager;
 
     TextView timeTv;
@@ -41,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Context mainContext;
 
     Boolean chronoIsRunning;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -58,8 +71,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         startBtn2 = (Button) findViewById(R.id.startBtn2);
         endBtn = (Button) findViewById(R.id.endBtn);
-        TextView testString=(TextView) findViewById(R.id.testString);
-        testString.setText("put String in this place and it will show on screen");
         chronoIsRunning = false;
 
         startBtn2.setOnClickListener(new View.OnClickListener() {
@@ -111,7 +122,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void onLocationChanged(Location location) {
                     double latitude = location.getLatitude();
-                    double longitude = location.getLongitude();
+                    double longitude = location.getLongitude();TextView name = (TextView) findViewById(R.id.profile_name);
+                    TextView dob = (TextView) findViewById(R.id.profile_DOB);
+                    TextView email = (TextView) findViewById(R.id.profile_Email);
 
                     LatLng latLng = new LatLng(latitude, longitude);
 
@@ -143,7 +156,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 }
             });
-
         }
 
         else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -183,7 +195,62 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             });
         }
+            new Thread(runnable).start();
+
+//        Handler handler = new Handler(Looper.getMainLooper());
    }
+
+    Runnable runnable = new Thread(new Runnable() {
+
+        public void run() {
+            Intent intent = getIntent();
+            JSONObject get_result = null;
+            String username = intent.getStringExtra(Intent.EXTRA_TEXT);
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("username", username);
+
+            while(true){
+                try {
+
+                    get_result = HttpUtils.submitGETData(params, "utf-8", "check_server");
+                    try {
+                        String info = get_result.getString("info");
+                        Log.w("Info",info);
+                        JSONObject result = new JSONObject(info);
+                        final Boolean warning = Boolean.valueOf(result.getString("ifWarning"));
+                        final Boolean recovery = Boolean.valueOf(result.getString("ifRecovery"));
+                        try{
+
+                            Thread.sleep(2000);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(warning && !recovery){
+                                        TextView testString=(TextView) findViewById(R.id.testString);
+                                        testString.setText("Warning");
+                                    }else if(!warning && recovery){
+                                        TextView testString=(TextView) findViewById(R.id.testString);
+                                        testString.setText("Recovery");
+                                    }else{
+                                        TextView testString=(TextView) findViewById(R.id.testString);
+                                        testString.setText("No Warning");
+                                    }
+                                }
+                            });
+                        } catch (InterruptedException e){
+                            e.printStackTrace();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    }
+    );
 
     public void updateTimeText(final String time) {
         runOnUiThread(new Runnable() {

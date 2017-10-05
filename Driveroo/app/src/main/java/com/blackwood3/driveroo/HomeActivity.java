@@ -39,7 +39,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent profileIntent=new Intent(getApplicationContext(),ProfileActivity.class);
-                profileIntent.putExtra(Intent.EXTRA_TEXT, username);
+
                 startActivity(profileIntent);
             }
         });
@@ -49,6 +49,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent startIntent2=new Intent(getApplicationContext(), MainActivity.class);
+                startIntent2.putExtra(Intent.EXTRA_TEXT, username);
                 startActivity(startIntent2);
             }
         });
