@@ -1,29 +1,81 @@
 package com.blackwood3.driveroo;
 
+import android.animation.ArgbEvaluator;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.R.id.edit;
+
 public class LoginActivity extends AppCompatActivity {
 
     //    Button logBtn=(Button) findViewById(R.id.button2);
+    private String decimalPlaces = "100";
+    private int colors[] ={Color.parseColor("#ffe476"),Color.parseColor("#FF5C1C")};
+    private EditText editText;
+    private ConstraintLayout rl;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        editText=(EditText)findViewById(R.id.passwordeditText);
+        rl=(ConstraintLayout) findViewById(R.id.login_layout);
+        rl.setBackgroundColor(colors[0]);
+        editText.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                int editSize = editText.getText().length();
+                //如果长度大于最大值就不变色了
+                if (editSize > Integer.valueOf(decimalPlaces))return;
+                //得到 当前所占百分比的渐变值
+                BigDecimal bigEs= BigDecimal.valueOf(editSize);
+                BigDecimal result = bigEs.divide(new BigDecimal(decimalPlaces), 8, RoundingMode.HALF_UP);
+
+
+                //颜色估值器
+                ArgbEvaluator evaluator = new ArgbEvaluator();
+                //得到背景渐变色
+                int evaluate = (int) evaluator.evaluate(result.floatValue(),colors[0],colors[1]);
+                rl.setBackgroundColor(evaluate);
+
+
+
+            }
+        });
+
+
+
 
         Button logBtn=(Button) findViewById(R.id.button2);
         logBtn.setOnClickListener(new View.OnClickListener() {

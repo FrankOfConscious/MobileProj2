@@ -3,16 +3,19 @@ package com.blackwood3.driveroo;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -33,8 +36,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     TextView timeTv;
     TextView disTv;
-    Button startBtn2;
-    Button endBtn;
+    ImageView startBtn2;
+    ImageView endBtn;
 
     Chronometer mChronometer;
     Thread mChronoThread;
@@ -56,8 +59,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         timeTv = (TextView) findViewById(R.id.timeTv);
         disTv = (TextView) findViewById(R.id.disTv);
 
-        startBtn2 = (Button) findViewById(R.id.startBtn2);
-        endBtn = (Button) findViewById(R.id.endBtn);
+        startBtn2 = (ImageView) findViewById(R.id.startBtn2);
+        endBtn = (ImageView) findViewById(R.id.endBtn);
         TextView testString=(TextView) findViewById(R.id.testString);
         testString.setText("put String in this place and it will show on screen");
         chronoIsRunning = false;
@@ -74,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         mChronometer.start();
 
                         chronoIsRunning = true;
-                        startBtn2.setText("Pause");
+                        startBtn2.setImageResource(R.drawable.pausefinal2_meitu_6);
                     }
 
                 } else {
@@ -86,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         mChronometer = null;
 
                         chronoIsRunning = false;
-                        startBtn2.setText("Start");
+                        startBtn2.setImageResource(R.drawable.startfinal2_meitu_4);
                     }
                 }
 
