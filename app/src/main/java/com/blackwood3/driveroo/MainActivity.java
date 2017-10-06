@@ -3,10 +3,12 @@ package com.blackwood3.driveroo;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -15,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,12 +31,12 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
@@ -46,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest locationRequest;
 
-    private Location lastLocation;
     private Location startLocation;
 
     private Marker currentLocationMarker;
@@ -62,17 +64,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     TextView disTv;
     Button startBtn2;
     Button endBtn;
+    Chronometer chronometer;
+
+    Boolean isRunning;
+    long lastPause;
 
     private static LatLng previousLatlng;
     private static float totalDistance = 0;
+    private static String distanceText;
 
 
     // variables below are used for chronometer.
-    Chronometer mChronometer;
-    Thread mChronoThread;
     Context mainContext;
-    Boolean chronoIsRunning;
-
 
     private static final long INTERVAL_OND_SECOND = 1000;
 
@@ -111,53 +114,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         startBtn2 = (Button) findViewById(R.id.startBtn2);
         endBtn = (Button) findViewById(R.id.endBtn);
-        chronoIsRunning = false;
+        chronometer = (Chronometer) findViewById(R.id.myChronometer);
+
+        isRunning = false;
 
         startBtn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                // use chronometer to calculate elapsed time
-                if (!chronoIsRunning) {
-
-                    if (mChronometer == null) {
-                        mChronometer = new Chronometer(mainContext);
-                        mChronoThread = new Thread(mChronometer);
-                        mChronoThread.start();
-                        mChronometer.start();
-
-                        chronoIsRunning = true;
-                        startBtn2.setText("Pause");
+                if (!isRunning) {
+                    if (lastPause == 0) {
+                        chronometer.setBase(SystemClock.elapsedRealtime());
+                    } else {
+                        chronometer.setBase(chronometer.getBase() + SystemClock.elapsedRealtime() - lastPause);
                     }
-
+                    chronometer.start();
+                    isRunning = true;
+                    startBtn2.setText("Pause");
                 } else {
 
-                    if (mChronometer != null) {
-                        mChronometer.stop();
-                        mChronoThread.interrupt();
-                        mChronoThread = null;
-                        mChronometer = null;
-
-                        chronoIsRunning = false;
-                        startBtn2.setText("Start");
-                    }
+                    lastPause = SystemClock.elapsedRealtime();
+                    chronometer.stop();
+                    isRunning = false;
+                    startBtn2.setText("Resume");
                 }
-
-
             }
         });
+
     }
 
-    public void updateTimeText(final String time) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                String text = "Time: ";
-                text += time;
-                timeTv.setText(text);
-            }
-        });
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -275,8 +259,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onLocationChanged(Location location) {
 
-        lastLocation = location;
-
         if (currentLocationMarker != null) {
             currentLocationMarker.remove();
         }
@@ -287,43 +269,65 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             start_longitude = startLocation.getLongitude();
         }
 
-        end_latitude = location.getLatitude();
-        end_longitude = location.getLongitude();
-        String locationStr = String.valueOf(end_latitude);
-        locationStr += String.valueOf(end_longitude);
-        LatLng latLng = new LatLng(end_latitude, end_longitude);
-
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.title("Start location");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-
-        currentLocationMarker = mMap.addMarker(markerOptions);
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomBy(16.2f));
-
-        Toast.makeText(MainActivity.this, "Your Location Now At: " + locationStr, Toast.LENGTH_LONG).show();
-
-        if (mGoogleApiClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-            Log.d("onLocationChanged", "Removing Location Updates");
+        if (previousLatlng == null) {
+            previousLatlng = new LatLng(start_latitude, start_longitude);
         }
 
-        String url = getDirectionsUrl();
-        Object dataTransfer[] = new Object[3];
-        GetDirectionsData getDirectionsData = new GetDirectionsData();
-        dataTransfer[0] = mMap;
-        dataTransfer[1] = url;
-        dataTransfer[2] = new LatLng(end_latitude, end_longitude);
-        getDirectionsData.execute(dataTransfer);
+        end_latitude = location.getLatitude();
+        end_longitude = location.getLongitude();
+
+        // show location on toast
+        String locationStr = String.valueOf(end_latitude);
+        locationStr += ", ";
+        locationStr += String.valueOf(end_longitude);
+
+        // show changed location
+        LatLng latLng = new LatLng(end_latitude, end_longitude);
+
+        // show distance
+        float[] result = new float[1];
+        Location.distanceBetween(previousLatlng.latitude, previousLatlng.longitude, end_latitude, end_longitude, result);
+        totalDistance += result[0];
+        float showDistance = totalDistance;
+        DecimalFormat decimalFormat = new DecimalFormat("0.00");
+        distanceText = "Distance: ";
+        distanceText += decimalFormat.format(showDistance);
+
+        disTv.setText(distanceText);
+        previousLatlng = latLng;
+
+        // set markers on map
+//        MarkerOptions markerOptions = new MarkerOptions();
+//        markerOptions.position(latLng);
+//        markerOptions.title("Start location");
+////        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+//        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.black_car_icon));
+//        currentLocationMarker = mMap.addMarker(markerOptions);
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.1f));
+//        mMap.animateCamera(CameraUpdateFactory.zoomBy(16.2f));
+
+        Toast.makeText(MainActivity.this, "Now At: " + locationStr, Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, distanceText, Toast.LENGTH_SHORT).show();
+        previousLatlng = latLng;
+        points.add(latLng);
+        redRawLine(mMap, points, latLng, line);
+
+        // using directions API
+//        String url = getDirectionsUrl();
+//        Object dataTransfer[] = new Object[3];
+//        GetDirectionsData getDirectionsData = new GetDirectionsData();
+//        dataTransfer[0] = mMap;
+//        dataTransfer[1] = url;
+//        dataTransfer[2] = new LatLng(end_latitude, end_longitude);
+//        getDirectionsData.execute(dataTransfer);
     }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         locationRequest = new LocationRequest();
-        locationRequest.setInterval(2000);
-        locationRequest.setFastestInterval(2000);
+        locationRequest.setInterval(3000);
+        locationRequest.setFastestInterval(3000);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
         if (ContextCompat.checkSelfPermission(this,
@@ -356,6 +360,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             return false;
         }
         return true;
+    }
+
+    private static void redRawLine(GoogleMap mMap, ArrayList<LatLng> points, LatLng currentLocation, Polyline line) {
+        mMap.clear(); // clear all markers and Polylines
+        PolylineOptions options = new PolylineOptions().width(10).color(Color.CYAN).geodesic(true);
+
+        for (int i = 0; i < points.size(); i++) {
+            LatLng point = points.get(i);
+            options.add(point);
+        }
+
+//        mMap.addMarker(new MarkerOptions().position(currentLocation)); // add marker at current position
+        line = mMap.addPolyline(options);
     }
 
 //    private void redRawLine() {
