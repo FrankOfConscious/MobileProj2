@@ -23,8 +23,8 @@
 
     <TextView
         android:id="@+id/timeTv"
-        android:layout_width="390dp"
-        android:layout_height="60dp"
+        android:layout_width="159dp"
+        android:layout_height="44dp"
         android:fontFamily="monospace"
         android:text="Time:"
         android:textAlignment="viewStart"
@@ -36,8 +36,22 @@
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="40dp"
-        app:layout_constraintHorizontal_bias="0.6" />
+        android:layout_marginTop="49dp"
+        app:layout_constraintHorizontal_bias="0.114" />
+
+    <Chronometer
+        android:id="@+id/chronometer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="35dp"
+        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        android:textSize="49sp"
+        app:layout_constraintHorizontal_bias="0.524"
+        app:layout_constraintLeft_toRightOf="@+id/timeTv"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/disTv"
