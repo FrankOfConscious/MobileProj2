@@ -10,10 +10,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import java.util.Date;
+import java.net.MalformedURLException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+
 
 public class SignUpActivity extends AppCompatActivity {
+    Boolean responded;
+    Boolean success;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +78,8 @@ public class SignUpActivity extends AppCompatActivity {
         click_to_sign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                responded=false;
+
                 EditText emailET= (EditText)findViewById(R.id.emailET);
                 String email=emailET.getText().toString();
 
@@ -97,21 +110,53 @@ public class SignUpActivity extends AppCompatActivity {
 
                 if(testMail(email) && !nullpassword && isMatch && isMoblie && isValidUserName){
                     // Send them to server to check is Email has been signed
-                    isEmailValid=false; //change value from the respond of the server
+                    responded=false;
+                    success=false;
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("username", userName);
+                    params.put("email",email);
+                    params.put("mobile",mobileNo);
+                    params.put("password", password1);
+                    params.put("ifWarning","false");
+                    params.put("ifRecovery","false");
+                    params.put("ifStart","false");
+                    params.put("car","2");
+                    params.put("face","");
+                    params.put("index","1");
+                    signup(params);
+
+                    //isEmailValid=false; //change value from the respond of the server
                     userNameStatus.setImageLevel(1);
                     emailStatus.setImageLevel(1);
                     setPassword.setImageLevel(1);
                     mobile_status.setImageLevel(1);
                     passwordStatus.setImageLevel(1);
+                    long timeFlag=System.currentTimeMillis()+5000;
+
+                    while(true){
+                        if(responded==true ||
+                                email.equals("y@y.y")||
+                               System.currentTimeMillis()>=timeFlag ) break;
+                    }
+                    isEmailValid=success;
                     if(email.equals("y@y.y")||isEmailValid){
+                        Toast.makeText(SignUpActivity.this, "Successfully signed up!", Toast.LENGTH_SHORT).show();
                         Intent jumpToLogin= new Intent(getApplicationContext(), LoginActivity.class);
                         startActivity(jumpToLogin);
                         finish();
                     }else{
                         //Image1.set
                         emailStatus.setImageLevel(2);
-                        emailET.setHint("Account already exists");
-
+                        if(responded) {
+                            emailStatus.setImageLevel(2);
+                            emailET.setHint("Account already exists");
+                            Toast.makeText(SignUpActivity.this, "Account already exists!", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            emailET.setHint("The server is not responding");
+                            emailStatus.setImageLevel(1);
+                            Toast.makeText(SignUpActivity.this, "Server time-out, try again", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }else{
 
@@ -147,6 +192,30 @@ public class SignUpActivity extends AppCompatActivity {
         });
 
 
+    }
+    private void signup(final Map<String, String> params){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // need to be deleted
+                JSONObject post_result = null;
+
+                try {
+                    post_result = HttpUtils.submitPostData(params, "utf-8", "signup");
+                    try {
+                        String loginStatus = post_result.getString("signup_status");
+                        //Boolean isEmailValid = Boolean.valueOf(loginStatus);
+                        responded=true;
+                        success=Boolean.valueOf(loginStatus);
+
+                    }catch (JSONException e){
+                        e.printStackTrace();
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     public static boolean isMobileNO(String mobiles) {

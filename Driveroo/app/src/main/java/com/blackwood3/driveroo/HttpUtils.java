@@ -5,10 +5,8 @@ package com.blackwood3.driveroo;
  */
 
 import android.util.Log;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -75,7 +73,7 @@ public class HttpUtils {
         JSONObject nullreturn = new JSONObject();
         String url = new String();
         if(operation.equals("getProfile")){
-            url = "http://192.168.1.107:5000/getProfile?";
+            url = "http://192.169.0.20:5000/getProfile?";
             url += getGETRequestUrl(params,encode);
             Log.w("URL",url);
             URL obj = new URL(url);
@@ -100,7 +98,7 @@ public class HttpUtils {
             }
 
         }else if(operation.equals(("check_server"))){
-            url = "http://192.168.1.107:5000/check_server?";
+            url = "http://192.169.0.20:5000/check_server?";
             url += getGETRequestUrl(params,encode);
             Log.w("URL",url);
             URL obj = new URL(url);

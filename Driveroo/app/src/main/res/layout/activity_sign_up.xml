@@ -13,7 +13,7 @@
         android:layout_width="26dp"
         android:layout_height="26dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="18dp"
         android:src="@drawable/level_list"
         app:layout_constraintLeft_toRightOf="@+id/phoneET"
         app:layout_constraintTop_toBottomOf="@+id/passwordET2"
@@ -181,7 +181,7 @@
         android:src="@drawable/level_list"
         app:layout_constraintLeft_toRightOf="@+id/passwordET"
         app:srcCompat="@android:drawable/list_selector_background"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="17dp"
         app:layout_constraintTop_toBottomOf="@+id/emailET" />
 
     <ImageView
