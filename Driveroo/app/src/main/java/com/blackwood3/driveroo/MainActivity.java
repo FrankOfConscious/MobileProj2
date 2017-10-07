@@ -1,37 +1,40 @@
 package com.blackwood3.driveroo;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 import java.io.IOException;
 import java.util.List;
+import android.content.Intent;
+import android.util.Log;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Handler;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
 
     private GoogleMap mMap;
+    private Handler handler;
     LocationManager locationManager;
 
     TextView timeTv;
@@ -115,7 +118,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public void onLocationChanged(Location location) {
                     double latitude = location.getLatitude();
                     double longitude = location.getLongitude();
-
                     LatLng latLng = new LatLng(latitude, longitude);
 
                     Geocoder geocoder = new Geocoder(getApplicationContext());
@@ -186,8 +188,62 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             });
         }
+        new Thread(runnable).start();
    }
 
+
+
+    Runnable runnable = new Thread(new Runnable() {
+
+        public void run() {
+            Intent intent = getIntent();
+            JSONObject get_result = null;
+            String username = intent.getStringExtra(Intent.EXTRA_TEXT);
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("username", username);
+
+            while(true){
+                try {
+
+                    get_result = HttpUtils.submitGETData(params, "utf-8", "check_server");
+                    try {
+                        String info = get_result.getString("info");
+                        Log.w("Info",info);
+                        JSONObject result = new JSONObject(info);
+                        final Boolean warning = Boolean.valueOf(result.getString("ifWarning"));
+                        final Boolean recovery = Boolean.valueOf(result.getString("ifRecovery"));
+                        try{
+
+                            Thread.sleep(2000);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(warning && !recovery){
+                                        TextView testString=(TextView) findViewById(R.id.testString);
+                                        testString.setText("Warning");
+                                    }else if(!warning && recovery){
+                                        TextView testString=(TextView) findViewById(R.id.testString);
+                                        testString.setText("Recovery");
+                                    }else{
+                                        TextView testString=(TextView) findViewById(R.id.testString);
+                                        testString.setText("No Warning");
+                                    }
+                                }
+                            });
+                        } catch (InterruptedException e){
+                            e.printStackTrace();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    }
+    );
     public void updateTimeText(final String time) {
         runOnUiThread(new Runnable() {
             @Override

@@ -4,6 +4,8 @@ import android.animation.ArgbEvaluator;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -12,7 +14,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,19 +26,38 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static android.R.id.edit;
+import static android.net.wifi.SupplicantState.COMPLETED;
+import static android.os.Build.VERSION_CODES.M;
+
 
 public class LoginActivity extends AppCompatActivity {
-
     //    Button logBtn=(Button) findViewById(R.id.button2);
+    private static final int WRONG = 0;
+    private static final int RIGHT = 1;
+    TextView invalidPair;
     private String decimalPlaces = "100";
     private int colors[] ={Color.parseColor("#ffe476"),Color.parseColor("#FF5C1C")};
     private EditText editText;
     private ConstraintLayout rl;
+    private TextView stateText;
+
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == WRONG) {
+                stateText.setText("Incorrect Username and Password Pair.");
+            }
+            if (msg.what == RIGHT) {
+                stateText.setText("Authenticating...");
+            }
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        stateText=(TextView)findViewById(R.id.textView3) ;
+        //invalidPair=(TextView) findViewById(R.id.textView3);
         editText=(EditText)findViewById(R.id.passwordeditText);
         rl=(ConstraintLayout) findViewById(R.id.login_layout);
         rl.setBackgroundColor(colors[0]);
@@ -74,9 +94,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-
-
-
         Button logBtn=(Button) findViewById(R.id.button2);
         logBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,7 +112,6 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
-
         TextView signUp=(TextView)findViewById(R.id.login_sign_up);
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,12 +122,9 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+
     }
     private void login() {
-//        if (!validate()) {
-//            onLoginFailed();
-//            return;
-//        }
         new Thread(new Runnable() {
 
             @Override
@@ -131,13 +144,18 @@ public class LoginActivity extends AppCompatActivity {
                         String loginStatus = post_result.getString("login_status");
                         Log.i("POST_RESULT", loginStatus);
                         if(loginStatus.equals("true")) {
+                            Message msg= new Message();
+                            msg.what=RIGHT;
+                            handler.sendMessage(msg);
                             Intent homeIntent = new Intent(getApplicationContext(), HomeActivity.class);
                             homeIntent.putExtra(Intent.EXTRA_TEXT, username);
                             startActivity(homeIntent);
                             finish();
                         }else {
-                            TextView invalidPair=(TextView) findViewById(R.id.textView3);
-                            invalidPair.setText("Incorrect Username and Password Pair.");
+                            Message msg= new Message();
+                            msg.what=WRONG;
+                            handler.sendMessage(msg);
+                           // invalidPair.setText("Incorrect Username and Password Pair.");
                         }
                     }catch (JSONException e){
                         e.printStackTrace();

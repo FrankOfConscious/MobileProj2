@@ -32,11 +32,11 @@ public class HttpUtils {
          */
         JSONObject nullreturn = new JSONObject();
         byte[] data = getPOSTRequestData(params, encode).toString().getBytes();
-        URL url = new URL("http://10.12.155.251:5000/");
+        URL url = new URL("http://192.168.1.107:5000/");
         if (operation.equals("login")) {
-            url = new URL("http://10.12.155.251:5000/login");
+            url = new URL("http://192.168.1.107:5000/login");
         } else if (operation.equals("signup")) {
-            url = new URL("http://10.12.155.251:5000/signup");
+            url = new URL("http://192.168.1.107:5000/signup");
         }
         String doc2 = new String(data);
         Log.w("Input data", doc2);
@@ -75,7 +75,7 @@ public class HttpUtils {
         JSONObject nullreturn = new JSONObject();
         String url = new String();
         if(operation.equals("getProfile")){
-            url = "http://10.12.155.251:5000/getProfile?";
+            url = "http://192.168.1.107:5000/getProfile?";
             url += getGETRequestUrl(params,encode);
             Log.w("URL",url);
             URL obj = new URL(url);
@@ -99,6 +99,30 @@ public class HttpUtils {
                 httpURLConnection.disconnect();
             }
 
+        }else if(operation.equals(("check_server"))){
+            url = "http://192.168.1.107:5000/check_server?";
+            url += getGETRequestUrl(params,encode);
+            Log.w("URL",url);
+            URL obj = new URL(url);
+            HttpURLConnection httpURLConnection = null;
+            try{
+                httpURLConnection = (HttpURLConnection) obj.openConnection();
+                httpURLConnection.setRequestMethod("GET"); // 设置以POST方式提交数据
+//                httpURLConnection.setDoOutput(true);
+//                httpURLConnection.setDoInput(true);
+                // 设置请求体的类型是文本类型
+//                httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                int response = httpURLConnection.getResponseCode();     // 获得服务器响应码
+                if (response == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = httpURLConnection.getInputStream();
+                    return dealResponseResult(inputStream);             // 处理服务器响应结果
+                }
+
+            }catch (IOException e){
+                e.printStackTrace();
+            }finally {
+                httpURLConnection.disconnect();
+            }
         }
         return nullreturn;
     }
