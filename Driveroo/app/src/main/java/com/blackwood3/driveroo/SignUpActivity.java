@@ -158,29 +158,23 @@ public class SignUpActivity extends AppCompatActivity {
 
     public static boolean testMail(String strMail) {
 
-
         if(strMail.indexOf("@") == -1 || strMail.indexOf(".") == -1) {
-           // System.out.println("1");
+            System.out.println("1");
             return false;
         }
-
-        if(strMail.indexOf("@") != strMail.lastIndexOf("@") || strMail.indexOf(".") != strMail.lastIndexOf(".")){
-            //System.out.println("2");
+        if(strMail.indexOf("@") != strMail.lastIndexOf("@") ){
+            System.out.println("2");
             return false;
         }
-
-        if(strMail.indexOf("@")>strMail.indexOf(".")) {
-           // System.out.println("3");
-            return false;
-        }
-
         for(int i = 0; i<strMail.indexOf("@"); i++) {
-            if(!((strMail.charAt(i) > 'A' && strMail.charAt(i) < 'Z') || (strMail.charAt(i) > 'a' && strMail.charAt(i) < 'z'))) {
-              //  System.out.println("4");
+            if(!((strMail.charAt(i) >= 'A' && strMail.charAt(i) <= 'Z') ||
+                    (strMail.charAt(i)>=48 && strMail.charAt(i)<=57)||
+                    (strMail.charAt(i)=='.' ||(strMail.charAt(i)=='_')) ||
+                    (strMail.charAt(i) >= 'a' && strMail.charAt(i) <= 'z'))) {
+                System.out.println("4");
                 return false;
             }
         }
-
         return true;
     }
 
