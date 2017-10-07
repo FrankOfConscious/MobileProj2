@@ -5,13 +5,20 @@ import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.MalformedURLException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -67,9 +74,9 @@ public class SignUpActivity extends AppCompatActivity {
         click_to_sign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String username = "New User";
                 EditText emailET= (EditText)findViewById(R.id.emailET);
                 String email=emailET.getText().toString();
-
                 EditText passwordET= (EditText)findViewById(R.id.passwordET);
                 String password1=passwordET.getText().toString();
 
@@ -79,31 +86,36 @@ public class SignUpActivity extends AppCompatActivity {
                 EditText mobileET=(EditText)findViewById(R.id.phoneET);
                 String mobileNo=mobileET.getText().toString();
 
-                EditText userNameET=(EditText) findViewById(R.id.userNameET);
-                String userName=userNameET.getText().toString();
-
                 ImageView emailStatus=(ImageView) findViewById(R.id.status1);
                 ImageView passwordStatus=(ImageView)findViewById(R.id.status2);
                 ImageView setPassword=(ImageView) findViewById(R.id.set_password);
                 ImageView mobile_status=(ImageView)findViewById(R.id.mobile);
-                ImageView userNameStatus=(ImageView)findViewById(R.id.statusUser);
 
 
                 Boolean isMoblie=isMobileNO(mobileNo);
                 Boolean isMatch= password1.equals(password2);
                 Boolean nullpassword=password1.equals("");
-                Boolean isEmailValid=false;
-                Boolean isValidUserName=!userName.equals("");
+                Boolean isEmailValid = testMail(email);
 
-                if(testMail(email) && !nullpassword && isMatch && isMoblie && isValidUserName){
+                if(isEmailValid && !nullpassword && isMatch && isMoblie){
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("username", username);
+                    params.put("email",email);
+                    params.put("mobile",mobileNo);
+                    params.put("password", password1);
+                    params.put("ifWarning","false");
+                    params.put("ifRecovery","false");
+                    params.put("ifStart","false");
+                    params.put("car","2");
+                    params.put("face","");
+                    params.put("index","1");
+                    signup(params);
                     // Send them to server to check is Email has been signed
-                    isEmailValid=false; //change value from the respond of the server
-                    userNameStatus.setImageLevel(1);
                     emailStatus.setImageLevel(1);
                     setPassword.setImageLevel(1);
                     mobile_status.setImageLevel(1);
                     passwordStatus.setImageLevel(1);
-                    if(email.equals("y@y.y")||isEmailValid){
+                    if(isEmailValid){
                         Intent jumpToLogin= new Intent(getApplicationContext(), LoginActivity.class);
                         startActivity(jumpToLogin);
                         finish();
@@ -114,39 +126,51 @@ public class SignUpActivity extends AppCompatActivity {
 
                     }
                 }else{
-
-
+                    Log.w("else","!!!!!");
                     if(!testMail(email)) {
                         //Image1.set
                         emailStatus.setImageLevel(2);
                         emailET.setHint("Invalid Email address");
                     }else emailStatus.setImageLevel(1);
-
                     if(!isMatch) {
                         //Image2.set
                         passwordStatus.setImageLevel(2);
                         passwordET2.setHint("Not consistent");
                     }else passwordStatus.setImageLevel(1);
 
-                    if(nullpassword) {
-                        setPassword.setImageLevel(2);
-                        passwordStatus.setImageLevel(2);
-                    } else setPassword.setImageLevel(1);
-
+                    if(nullpassword) {setPassword.setImageLevel(2);passwordStatus.setImageLevel(2);}
+                    else setPassword.setImageLevel(1);
                     if(isMoblie) mobile_status.setImageLevel(1);
                     else mobile_status.setImageLevel(2);
 
-                    if(isValidUserName) userNameStatus.setImageLevel(1);
-                    else userNameStatus.setImageLevel(2);
-
                 }
-
-
-
             }
         });
 
 
+    }
+
+    private void signup(final Map<String, String> params){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // need to be deleted
+                JSONObject post_result = null;
+
+                try {
+                    post_result = HttpUtils.submitPostData(params, "utf-8", "signup");
+                    try {
+                        String loginStatus = post_result.getString("signup_status");
+                        Boolean isEmailValid = Boolean.valueOf(loginStatus);
+
+                    }catch (JSONException e){
+                        e.printStackTrace();
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     public static boolean isMobileNO(String mobiles) {
