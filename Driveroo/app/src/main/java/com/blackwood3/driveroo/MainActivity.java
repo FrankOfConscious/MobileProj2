@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static String distanceText;
 
 
+
     // variables below are used for chronometer.
     Context mainContext;
 
@@ -163,15 +164,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         endBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+//                if (!isRunning) {
+//                    recordTime = lastPause - chronometer.getBase();
+//                    recordTimeStr = String.valueOf(recordTime);
+//                    Toast.makeText(MainActivity.this, recordTimeStr, Toast.LENGTH_SHORT).show();
+//                } else {
+//                    recordTime = SystemClock.elapsedRealtime() - chronometer.getBase();
+//                    recordTimeStr = String.valueOf(recordTime);
+//                    Toast.makeText(MainActivity.this, recordTimeStr, Toast.LENGTH_SHORT).show();
+//                }
                 if (!isRunning) {
-                    recordTime = lastPause - chronometer.getBase();
-                    recordTimeStr = String.valueOf(recordTime);
-                    Toast.makeText(MainActivity.this, recordTimeStr, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "You have not started driving!", Toast.LENGTH_SHORT).show();
                 } else {
-                    recordTime = SystemClock.elapsedRealtime() - chronometer.getBase();
-                    recordTimeStr = String.valueOf(recordTime);
-                    Toast.makeText(MainActivity.this, recordTimeStr, Toast.LENGTH_SHORT).show();
+                    Intent endIntent = new Intent(getApplicationContext(), EndActivity.class);
+                    String timeStr = String.valueOf(recordTime);
+                    endIntent.putExtra("time", timeStr);
+                    endIntent.putExtra("distance", distanceText);
+                    startActivity(endIntent);
                 }
+
             }
         });
 
@@ -267,7 +279,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
            buildGoogleApiClient();
            mMap.setMyLocationEnabled(true);
        }
-
     }
 
 
@@ -416,6 +427,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
 
     }
 

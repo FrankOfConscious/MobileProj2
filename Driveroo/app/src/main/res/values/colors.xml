@@ -4,4 +4,9 @@
     <color name="colorPrimaryDark">#ffe476</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorDark">#000000</color>
+    <color name="googleGreen">#3cba54</color>
+    <color name="googleYellow">#f4c20d</color>
+    <color name="googleRed">#db3236</color>
+    <color name="googleBlue">#4885ed</color>
+    <color name="liamCyan">	#48D1CC</color>
 </resources>
