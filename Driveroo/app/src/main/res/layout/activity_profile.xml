@@ -29,27 +29,24 @@
         android:layout_height="25dp"
         android:layout_marginLeft="24dp"
         android:layout_marginTop="16dp"
-        android:fontFamily="serif"
-        android:text="History  :"
-        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:text="Mobile :"
+        android:textColor="@color/colorDark"
         android:textSize="16sp"
-        android:textStyle="bold|italic"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_Email" />
 
     <TextView
-        android:id="@+id/profile_DOB"
+        android:id="@+id/profile_Car"
         android:layout_width="300dp"
         android:layout_height="25dp"
         android:layout_marginLeft="24dp"
         android:layout_marginTop="16dp"
-        android:fontFamily="serif"
-        android:text="Car    :"
-        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:text="Car       :"
+        android:textColor="@color/colorDark"
         android:textSize="16sp"
-        android:textStyle="bold|italic"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_name" />
+
 
     <TextView
         android:id="@+id/profile_Email"
@@ -57,13 +54,11 @@
         android:layout_height="25dp"
         android:layout_marginLeft="24dp"
         android:layout_marginTop="16dp"
-        android:fontFamily="serif"
-        android:text="Email  :"
-        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:text="Email   :"
+        android:textColor="@color/colorDark"
         android:textSize="16sp"
-        android:textStyle="bold|italic"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_DOB" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_Car" />
 
     <ImageView
         android:id="@+id/profile_logo"
@@ -97,11 +92,9 @@
         android:layout_height="25dp"
         android:layout_marginLeft="24dp"
         android:layout_marginTop="235dp"
-        android:fontFamily="serif"
-        android:text="Name :"
-        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:text="Name   :"
+        android:textColor="@color/colorDark"
         android:textSize="16sp"
-        android:textStyle="bold|italic"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

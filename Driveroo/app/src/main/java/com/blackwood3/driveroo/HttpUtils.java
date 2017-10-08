@@ -150,6 +150,26 @@ public class HttpUtils {
             }finally {
                 httpURLConnection.disconnect();
             }
+        } else if(operation.equals("get_result")){
+            url = "http://192.168.1.107:5001/get_result?";
+            url += getGETRequestUrl(params,encode);
+            Log.w("URL",url);
+            URL obj = new URL(url);
+            HttpURLConnection httpURLConnection = null;
+            try{
+                httpURLConnection = (HttpURLConnection) obj.openConnection();
+                httpURLConnection.setRequestMethod("GET");
+                int response = httpURLConnection.getResponseCode();
+                if (response == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = httpURLConnection.getInputStream();
+                    return dealResponseResult(inputStream);
+                }
+
+            }catch (IOException e){
+                e.printStackTrace();
+            }finally {
+                httpURLConnection.disconnect();
+            }
         }
         return nullreturn;
     }

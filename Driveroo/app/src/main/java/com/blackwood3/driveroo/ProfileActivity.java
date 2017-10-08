@@ -1,9 +1,8 @@
 package com.blackwood3.driveroo;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
@@ -11,7 +10,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,14 +45,16 @@ public class ProfileActivity extends AppCompatActivity {
                 try {
                     JSONObject profile = new JSONObject(get_result.getString("profile"));
                     String Smobile = profile.getString("mobile");
-                    String Scar = profile.getString("car");
+                    String car_number = profile.getString("car");
                     String Semail = profile.getString("email");
                     TextView name = (TextView) findViewById(R.id.profile_name);
-                    TextView dob = (TextView) findViewById(R.id.profile_DOB);
                     TextView email = (TextView) findViewById(R.id.profile_Email);
-                    name.setText("Name : "+username);
-                    dob.setText("Car  : "+Scar);
-                    email.setText("Email: "+Semail);
+                    TextView car = (TextView) findViewById(R.id.profile_Car);
+                    TextView mobile = (TextView) findViewById(R.id.profile_record);
+                    name.setText("Name   :"+username);
+                    email.setText("Email   :"+Semail);
+                    car.setText("Car       :"+car_number);
+                    mobile.setText("Mobile :"+Smobile);
 
                 } catch (JSONException e) {
                     e.printStackTrace();

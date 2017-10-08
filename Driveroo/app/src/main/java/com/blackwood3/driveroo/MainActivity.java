@@ -46,7 +46,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.math.BigDecimal;
@@ -56,9 +55,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import static android.R.attr.offset;
-import static android.R.id.edit;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -121,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             if(warning>=3){
                 //currentTime=System.currentTimeMillis();
 
-                if(currentTime+4000<System.currentTimeMillis()){
+                if(currentTime+5000<System.currentTimeMillis()){
                     if(warning>=6){
                         Toast.makeText(MainActivity.this, "Warning >= 6", Toast.LENGTH_SHORT).show();
                         mplay2.start();
@@ -197,14 +193,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void afterTextChanged(Editable editable) {
                 int editSize = editText.getText().length();
-                //如果长度大于最大值就不变色了
+
                 if (editSize > Integer.valueOf(decimalPlaces))return;
-                //得到 当前所占百分比的渐变值
+
                 BigDecimal bigEs= BigDecimal.valueOf(editSize);
                 BigDecimal result = bigEs.divide(new BigDecimal(decimalPlaces), 8, RoundingMode.HALF_UP);
-                //颜色估值器
+
                 ArgbEvaluator evaluator = new ArgbEvaluator();
-                //得到背景渐变色
+
                 int evaluate = (int) evaluator.evaluate(result.floatValue(),colors[0],colors[1]);
                 rl.setBackgroundColor(evaluate);
             }
@@ -275,9 +271,45 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                    recordTimeStr = String.valueOf(recordTime);
 //                    Toast.makeText(MainActivity.this, recordTimeStr, Toast.LENGTH_SHORT).show();
 //                }
+//                if(isRunning){
+//                    ifCheckServer = false;
+//                    new Thread(runnable_end).start();
+//                    recordTime = SystemClock.elapsedRealtime() - chronometer.getBase();
+//                    if (distanceText == null) {
+//                        distanceText = "0.0 m";
+//                    }
+//                    String timeStr = timeDifference(recordTime);
+//
+//                    Intent userintent = getIntent();
+//                    String username = userintent.getStringExtra(Intent.EXTRA_TEXT);
+//                    Intent endIntent = new Intent(getApplicationContext(), EndActivity.class);
+//                    endIntent.putExtra("time", timeStr);
+//                    endIntent.putExtra("distance", distanceText);
+//                    endIntent.putExtra("username", username);
+//                    startActivity(endIntent);
+//                    finish();
+//                }else{
+//                    Toast.makeText(MainActivity.this, "You have not started driving!", Toast.LENGTH_SHORT).show();
+//                }
                 if(isRunning){
                     ifCheckServer = false;
                     new Thread(runnable_end).start();
+                    recordTime = SystemClock.elapsedRealtime() - chronometer.getBase();
+                    if (distanceText == null) {
+                        distanceText = "0.0 m";
+                    }
+                    String timeStr = timeDifference(recordTime);
+
+                    Intent userintent = getIntent();
+                    String username = userintent.getStringExtra(Intent.EXTRA_TEXT);
+                    Intent endIntent = new Intent(getApplicationContext(), EndActivity.class);
+                    endIntent.putExtra("time", timeStr);
+                    endIntent.putExtra("distance", distanceText);
+                    endIntent.putExtra("username", username);
+                    startActivity(endIntent);
+                    finish();
+                }else{
+                    Toast.makeText(MainActivity.this, "You have not started driving!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -404,7 +436,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
            buildGoogleApiClient();
            mMap.setMyLocationEnabled(true);
        }
-        Toast.makeText(MainActivity.this, "in onmapready", Toast.LENGTH_SHORT).show();
+
     }
 
 
@@ -499,9 +531,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         totalDistance += result[0];
         float showDistance = totalDistance;
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
-        distanceText = "";
-        distanceText += decimalFormat.format(showDistance);
-        distanceText+=" km";
+        if (showDistance >= 1000) {
+            showDistance = showDistance/1000;
+            distanceText = "";
+            distanceText += decimalFormat.format(showDistance);
+            distanceText += " km";
+        } else {
+            distanceText = "";
+            distanceText += decimalFormat.format(showDistance);
+            distanceText += " m";
+        }
 
         disTv.setText(distanceText);
         previousLatlng = latLng;
@@ -583,6 +622,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 //        mMap.addMarker(new MarkerOptions().position(currentLocation)); // add marker at current position
         line = mMap.addPolyline(options);
+    }
+
+    public static String timeDifference(long timeDifference1) {
+        long timeDifference = timeDifference1 / 1000;
+        int h = (int) (timeDifference / (3600));
+        int m = (int) ((timeDifference - (h * 3600)) / 60);
+        int s = (int) (timeDifference - (h * 3600) - m * 60);
+
+        return String.format("%02d:%02d:%02d", h, m, s);
     }
 
 //    private void redRawLine() {
