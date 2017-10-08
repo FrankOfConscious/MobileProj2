@@ -48,4 +48,6 @@ class detection_start:
                 if_pupil_detection[i['_id']] = i['ifStart']
 
 ds = detection_start()
+# the input of .start()is the car number. We default think that every embeded detection system know the car number.
+# it is just like one car has one embeded detection system, and the system knows the car number.
 ds.start(1)
