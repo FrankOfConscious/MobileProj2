@@ -8,4 +8,4 @@ Cloud: using Azure FaceAPI, CosmosDB, VM
 2. The backend foler contains the flask server and detection system.
 3. There is an operation README.txt inside of backend folder.
 
-# Enjoy you day and keeep safe!
+# Enjoy you day and keep safe!
