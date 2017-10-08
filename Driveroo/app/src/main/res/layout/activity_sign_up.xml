@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/bg_signup"
+    android:background="@drawable/road2_meitu_2"
+    tools:context="com.blackwood3.driveroo.SignUpActivity">
+
+    <ImageView
+        android:id="@+id/mobile"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="18dp"
+        android:src="@drawable/level_list"
+        app:layout_constraintLeft_toRightOf="@+id/phoneET"
+        app:layout_constraintTop_toBottomOf="@+id/passwordET2"
+        app:srcCompat="@android:drawable/list_selector_background" />
+
+    <TextView
+        android:id="@+id/sign_up_intro1"
+        android:layout_width="210dp"
+        android:layout_height="29dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="51dp"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="Become a member of "
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintHorizontal_bias="0.043"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/emailET"
+        style="@style/editText_style"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:ems="10"
+        android:fontFamily="casual"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:textStyle="italic"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="17dp"
+        app:layout_constraintTop_toBottomOf="@+id/userNameET" />
+
+    <EditText
+        android:id="@+id/userNameET"
+        style="@style/editText_style"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="140dp"
+        android:ems="10"
+        android:fontFamily="casual"
+        android:hint="UserName"
+        android:inputType="textEmailAddress"
+        android:textStyle="italic"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sign_up_intro1" />
+
+    <EditText
+        android:id="@+id/passwordET"
+        style="@style/editText_style"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:fontFamily="casual"
+        android:hint="Set Password"
+        android:inputType="textPassword"
+        android:textStyle="italic"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/emailET" />
+
+    <EditText
+        android:id="@+id/passwordET2"
+        style="@style/editText_style"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:fontFamily="casual"
+        android:hint="Confirm Password"
+        android:inputType="textPassword"
+        android:textStyle="italic"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passwordET" />
+
+    <EditText
+        android:id="@+id/carET"
+        style="@style/editText_style"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="17dp"
+        android:ems="10"
+        android:fontFamily="casual"
+        android:hint="License Plate NO. "
+        android:inputType="textEmailAddress"
+        android:textStyle="italic"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phoneET" />
+
+    <EditText
+        android:id="@+id/phoneET"
+        style="@style/editText_style"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="17dp"
+        android:ems="10"
+        android:fontFamily="casual"
+        android:hint="Mobile No."
+        android:inputType="number"
+        android:textStyle="italic"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passwordET2"
+        app:layout_constraintHorizontal_bias="0.503" />
+
+    <Button
+        android:id="@+id/click_to_sign"
+        style="@style/button_style"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="24dp"
+        android:fontFamily="sans-serif"
+        android:text="SignUp"
+        android:textColor="?android:attr/colorPressedHighlight"
+        android:textSize="22sp"
+        android:textStyle="bold|italic"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/carET" />
+
+    <ImageView
+        android:id="@+id/imageView11"
+        android:layout_width="294dp"
+        android:layout_height="223dp"
+        app:srcCompat="@drawable/driveroo4"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="32dp" />
+
+    <ImageView
+        android:id="@+id/set_password"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_marginLeft="8dp"
+        android:src="@drawable/level_list"
+        app:layout_constraintLeft_toRightOf="@+id/passwordET"
+        app:srcCompat="@android:drawable/list_selector_background"
+        android:layout_marginTop="17dp"
+        app:layout_constraintTop_toBottomOf="@+id/emailET" />
+
+    <ImageView
+        android:id="@+id/status2"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:src="@drawable/level_list"
+        app:srcCompat="@android:drawable/list_selector_background"
+        app:layout_constraintLeft_toRightOf="@+id/passwordET2"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="17dp"
+        app:layout_constraintTop_toBottomOf="@+id/passwordET" />
+
+    <ImageView
+        android:id="@+id/status1"
+        android:src="@drawable/level_list"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toRightOf="@+id/emailET"
+        app:srcCompat="@android:drawable/list_selector_background"
+        android:layout_marginTop="18dp"
+        app:layout_constraintTop_toBottomOf="@+id/userNameET" />
+
+    <ImageView
+        android:id="@+id/statusUser"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_marginLeft="8dp"
+        android:src="@drawable/level_list"
+        app:layout_constraintLeft_toRightOf="@+id/userNameET"
+        app:srcCompat="@android:drawable/list_selector_background"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="220dp" />
+
+    <TextView
+        android:id="@+id/signup_signin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text="I am a member, Sign in "
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="18sp"
+        android:textStyle="italic"
+        app:layout_constraintHorizontal_bias="0.966"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@+id/click_to_sign" />
+
+</android.support.constraint.ConstraintLayout>
