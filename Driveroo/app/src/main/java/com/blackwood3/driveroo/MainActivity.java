@@ -30,7 +30,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -45,9 +44,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-
 import org.json.JSONObject;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.MalformedURLException;
@@ -65,25 +62,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest locationRequest;
-
     private Location startLocation;
-
     private Marker currentLocationMarker;
     public static final int REQUEST_LOCATION_CODE = 99;
-
     double start_latitude, start_longitude;
     double end_latitude, end_longitude;
     private ArrayList<LatLng> points;
     Boolean ifCheckServer = true;
     Polyline line;
-
     LocationManager locationManager;
-    //TextView timeTv;
     TextView disTv;
     ImageView startBtn2;
     ImageView endBtn;
     Chronometer chronometer;
-
     Boolean isRunning;
     long lastPause;
     long recordTime;
@@ -101,15 +92,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Context mainContext;
 
     private static final long INTERVAL_OND_SECOND = 1000;
-
     private String decimalPlaces = "80";
     private int colors[] ={Color.parseColor("#86FF59"),Color.parseColor("#FF5C1C")};//86FF59 //#ffe476
     private EditText editText;
     private ConstraintLayout rl;
-    private TextView stateText;
-    private int currentWarningLevel;
     private long currentTime;
 
+    /**
+     * Handle the message passed from server. This is to set warning level based on server's response.
+     * The warning level is represented by the length of  a String "level".
+     */
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(final Message msg) {
@@ -119,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             int offset=warning*10-editLength;
             if(offset==0){
                 if(warning>=3){
-                    //currentTime=System.currentTimeMillis();
                     if(currentTime+5000<System.currentTimeMillis()){
                         if(warning>=6){
                             Toast.makeText(MainActivity.this, "Warning >= 6", Toast.LENGTH_SHORT).show();
@@ -194,6 +185,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mplay2=MediaPlayer.create(this,R.raw.warn2);
         mVib=(Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
         currentTime=System.currentTimeMillis();
+
+        /**
+         * Set a change listener to watch the change of warning level(represented by the length of editText),
+         * and set respective background color to remind the user to focus.
+         */
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -208,14 +204,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void afterTextChanged(Editable editable) {
                 int editSize = editText.getText().length();
-
                 if (editSize > Integer.valueOf(decimalPlaces))return;
-
                 BigDecimal bigEs= BigDecimal.valueOf(editSize);
                 BigDecimal result = bigEs.divide(new BigDecimal(decimalPlaces), 8, RoundingMode.HALF_UP);
-
                 ArgbEvaluator evaluator = new ArgbEvaluator();
-
                 int evaluate = (int) evaluator.evaluate(result.floatValue(),colors[0],colors[1]);
                 rl.setBackgroundColor(evaluate);
             }
@@ -224,28 +216,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
         points = new ArrayList<LatLng>(); // initialize points
-
         mainContext = this;
-
-        //timeTv = (TextView) findViewById(R.id.timeTv);
         disTv = (TextView) findViewById(R.id.disTv);
-
         startBtn2 = (ImageView) findViewById(R.id.startBtn2);
         endBtn = (ImageView) findViewById(R.id.endBtn);
-
         chronometer = (Chronometer) findViewById(R.id.chronometer);
-
         isRunning = false;
 
+        /**
+         * Set a Click Listener on Button "startBtn2", press this will keep tracking the driver's eyes and start to
+         * detect if the driver is distracted.
+         */
         startBtn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                // add something >
-
-                // add something <
 
                 if (!isRunning) {
                     // chronometer is not running, use following code to start or resume.
@@ -274,38 +259,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        /**
+         * *Set a Click Listener on Button "endBtn", press this will stop the tracking and detecting. Then
+         * jump to a new page to shoe the result and secuity report of this trip.
+         */
         endBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                if (!isRunning) {
-//                    recordTime = lastPause - chronometer.getBase();
-//                    recordTimeStr = String.valueOf(recordTime);
-//                    Toast.makeText(MainActivity.this, recordTimeStr, Toast.LENGTH_SHORT).show();
-//                } else {
-//                    recordTime = SystemClock.elapsedRealtime() - chronometer.getBase();
-//                    recordTimeStr = String.valueOf(recordTime);
-//                    Toast.makeText(MainActivity.this, recordTimeStr, Toast.LENGTH_SHORT).show();
-//                }
-//                if(isRunning){
-//                    ifCheckServer = false;
-//                    new Thread(runnable_end).start();
-//                    recordTime = SystemClock.elapsedRealtime() - chronometer.getBase();
-//                    if (distanceText == null) {
-//                        distanceText = "0.0 m";
-//                    }
-//                    String timeStr = timeDifference(recordTime);
-//
-//                    Intent userintent = getIntent();
-//                    String username = userintent.getStringExtra(Intent.EXTRA_TEXT);
-//                    Intent endIntent = new Intent(getApplicationContext(), EndActivity.class);
-//                    endIntent.putExtra("time", timeStr);
-//                    endIntent.putExtra("distance", distanceText);
-//                    endIntent.putExtra("username", username);
-//                    startActivity(endIntent);
-//                    finish();
-//                }else{
-//                    Toast.makeText(MainActivity.this, "You have not started driving!", Toast.LENGTH_SHORT).show();
-//                }
+
                 if(isRunning){
                     ifCheckServer = false;
                     new Thread(runnable_end).start();
@@ -314,7 +275,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         distanceText = "0.0 m";
                     }
                     String timeStr = timeDifference(recordTime);
-
                     Intent userintent = getIntent();
                     String username = userintent.getStringExtra(Intent.EXTRA_TEXT);
                     Intent endIntent = new Intent(getApplicationContext(), EndActivity.class);
@@ -328,11 +288,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         });
-       //*************************************
 
    }
 
 
+    /**
+     * Keep request the server to see if the driver is distracted or eye-closed. The result will passed to
+     * main thread by a Message handled by the Handler.
+     */
     Runnable runnable_warning = new Thread(new Runnable() {
 
         public void run() {
@@ -375,9 +338,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     e.printStackTrace();
                 }
             }
-
-
-
         }
     }
     );
@@ -393,7 +353,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }catch (MalformedURLException e){
                 e.printStackTrace();
             }
-
         }
     });
 
@@ -410,7 +369,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }catch (MalformedURLException e){
                 e.printStackTrace();
             }
-
         }
     });
 
@@ -446,7 +404,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
            buildGoogleApiClient();
            mMap.setMyLocationEnabled(true);
@@ -470,7 +427,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         googleDirectionsUrl.append("origin=" + start_latitude + "," + start_longitude);
         googleDirectionsUrl.append("&destination=" + end_latitude + "," + end_longitude);
         googleDirectionsUrl.append("&key=" + "AIzaSyA-b00JQ3i0Bv6wSzRY1H_zRKAEFVX4ztY");
-
         return googleDirectionsUrl.toString();
     }
 
@@ -493,8 +449,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         REQUEST_LOCATION_CODE);
-
-
             } else {
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this,
@@ -518,7 +472,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (currentLocationMarker != null) {
             currentLocationMarker.remove();
         }
-
         if (startLocation == null) {
             startLocation = location;
             start_latitude = startLocation.getLatitude();
@@ -564,7 +517,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        MarkerOptions markerOptions = new MarkerOptions();
 //        markerOptions.position(latLng);
 //        markerOptions.title("Start location");
-////        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+//        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
 //        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.black_car_icon));
 //        currentLocationMarker = mMap.addMarker(markerOptions);
 
@@ -635,7 +588,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             options.add(point);
         }
 
-//        mMap.addMarker(new MarkerOptions().position(currentLocation)); // add marker at current position
+//      mMap.addMarker(new MarkerOptions().position(currentLocation)); // add marker at current position
         line = mMap.addPolyline(options);
     }
 
@@ -648,17 +601,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return String.format("%02d:%02d:%02d", h, m, s);
     }
 
-//    private void redRawLine() {
-//        mMap.clear(); // clear all markers and Polylines
-//        PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
-//
-//        for (int i = 0; i < points.size(); i++) {
-//            LatLng point = points.get(i);
-//            options.add(point);
-//        }
-//
-//        mMap.addMarker(new MarkerOptions().position(latLng)); // add marker at current position
-//        line = mMap.addPolyline(options);
-//    }
 
 }

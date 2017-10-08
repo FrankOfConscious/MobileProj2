@@ -23,7 +23,6 @@ import java.util.Map;
 
 
 public class LoginActivity extends AppCompatActivity {
-    //    Button logBtn=(Button) findViewById(R.id.button2);
     private static final int WRONG = 0;
     private static final int RIGHT = 1;
     TextView invalidPair;
@@ -31,6 +30,10 @@ public class LoginActivity extends AppCompatActivity {
     private ConstraintLayout rl;
     private TextView stateText;
 
+    /**
+     * Handler will get the message passed from the work thread, it will change the UI based on two
+     * different results(permitted and denied) from server.
+     */
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -44,22 +47,28 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
     };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         stateText=(TextView)findViewById(R.id.textView3) ;
-        //invalidPair=(TextView) findViewById(R.id.textView3);
         editText=(EditText)findViewById(R.id.passwordeditText);
 
-
+        /**
+         * Set a Click Listener on Button "logBtn", pressing this button will send the user & password pair to
+         *the server and try to login. If been permitted, jump to HomeActivity which is the guide page with
+         *greeting, and finish this login activity. If been denied, keep this activity.
+         */
         Button logBtn=(Button) findViewById(R.id.button2);
         logBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 EditText usernameET=(EditText)findViewById(R.id.usereditText);
-
                 String username=usernameET.getText().toString();
+                //Being convenient to the developers, there is a backdoor: using username "admin"  to log in without
+                //requesting the server.
                 if(username.equals("admin")){
                     Intent homeIntent = new Intent(getApplicationContext(), HomeActivity.class);
                     homeIntent.putExtra(Intent.EXTRA_TEXT, username);
@@ -68,9 +77,13 @@ public class LoginActivity extends AppCompatActivity {
                 }else{
                     login();
                 }
-
             }
         });
+
+        /**
+         *Set a Click Listener on TextView "signup", pressing this button will guide the user to sign up a new
+         *account. After jumping to that page, this activity will be finished.
+         */
         TextView signUp=(TextView)findViewById(R.id.login_sign_up);
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,8 +94,12 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-
     }
+
+
+    /**Start a thread to send the login request to the server, and get server's respond. The server's
+     *respond will be passed to the main thread by Message handled by Handler.
+     */
     private void login() {
         new Thread(new Runnable() {
 
@@ -90,7 +107,6 @@ public class LoginActivity extends AppCompatActivity {
             public void run() {
                 Map<String, String> params = new HashMap<String, String>();
                 JSONObject post_result = null;
-
                 EditText usernameET=(EditText)findViewById(R.id.usereditText);
                 EditText passwordET=(EditText)findViewById(R.id.passwordeditText);
                 String username=usernameET.getText().toString();
@@ -114,7 +130,6 @@ public class LoginActivity extends AppCompatActivity {
                             Message msg= new Message();
                             msg.what=WRONG;
                             handler.sendMessage(msg);
-                           // invalidPair.setText("Incorrect Username and Password Pair.");
                         }
                     }catch (JSONException e){
                         e.printStackTrace();
@@ -126,39 +141,34 @@ public class LoginActivity extends AppCompatActivity {
         }).start();
     }
 
-    //    public void onLoginSuccess() {
-//        logBtn.setEnabled(true);
-//        finish();
-//    }
-//
+    /**
+     * For developers to test, you can ignore this. Not used any more in final version.
+     */
     public void onLoginFailed() {
         Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
-
-//        logBtn.setEnabled(true);
     }
 
+    /**
+     * For developers to validate the username and password, you can ignore this. Not used any more in final version.
+     */
     public boolean validate() {
         boolean valid = true;
-
         EditText usernameET=(EditText)findViewById(R.id.usereditText);
         EditText passwordET=(EditText)findViewById(R.id.passwordeditText);
         String username=usernameET.getText().toString();
         String password=passwordET.getText().toString();
-
         if (username.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(username).matches()) {
             usernameET.setError("enter a valid username");
             valid = false;
         } else {
             usernameET.setError(null);
         }
-
         if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
             passwordET.setError("between 4 and 10 alphanumeric characters");
             valid = false;
         } else {
             passwordET.setError(null);
         }
-
         return valid;
     }
 }

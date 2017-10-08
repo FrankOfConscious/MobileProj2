@@ -8,14 +8,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import org.json.JSONObject;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class EndActivity extends AppCompatActivity {
-
     MediaPlayer mediaPlayer;
     View mView;
     TextView timeTv;
@@ -25,16 +22,13 @@ public class EndActivity extends AppCompatActivity {
     TextView rateCommentTv;
     TextView userTv;
     TextView greetTv;
-
     String rate1;
     String rate2;
     String rate3;
     String rate4;
-
     String username;
     String rate;
     String warningTime;
-
     String rank;
 
     @Override
@@ -49,7 +43,6 @@ public class EndActivity extends AppCompatActivity {
         rateCommentTv = (TextView) findViewById(R.id.ratecommentTv);
         userTv = (TextView) findViewById(R.id.userTv);
         greetTv = (TextView) findViewById(R.id.greetTv);
-
         rate1 = "Excellent! You are the boss!";
         rate2 = "Safe and sound!" ;
         rate3 = "Focus more on the road!";
@@ -58,12 +51,13 @@ public class EndActivity extends AppCompatActivity {
         String timeText = extras.getString("time");
         String distanceText = extras.getString("distance");
         final String username = extras.getString("username");
-
         timeTv.setText(timeText);
         distanceTv.setText(distanceText);
-
         new Thread(runnable_getResult).start();
 
+        /**
+         *  set a Click Listener on Button "backToMain" , press this button will end this activity and jump to HomeActivity.
+         */
         Button backToMain=(Button)findViewById(R.id.backToMain);
         backToMain.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,11 +70,16 @@ public class EndActivity extends AppCompatActivity {
         });
 
 
-        // following is used to parse the data from Azure
+        /**
+         * following is used to parse the data from Azure
+         */
         while(rate == null) {
-
         }
 
+        /**
+         * After get the rate of this trip from the server, APP will gather some information and select some of
+         * them to form a feedback and display them on the screen. so that the user can see the report of this trip.
+         */
         switch (rate) {
             case "S":
                 mView.setBackgroundColor(getResources().getColor(R.color.googleGreen));
@@ -130,11 +129,13 @@ public class EndActivity extends AppCompatActivity {
                 mView.setBackgroundColor(getResources().getColor(R.color.liamCyan));
                 Log.d("Set background color", "something wrong");
                 break;
-
         }
 
     }
 
+    /**
+     * when EndActivity start, it will request the server to get some information such as warning times and rate of this trip.
+     */
     Runnable runnable_getResult = new Thread(new Runnable() {
         @Override
         public void run() {
@@ -147,7 +148,6 @@ public class EndActivity extends AppCompatActivity {
                 get_result = HttpUtils.submitGETData(params, "utf-8", "get_result");
                 warningTime = get_result.getString("waring_times");
                 rate = get_result.getString("index");
-
                 Log.w("Warning times:",warningTime);
             }catch (Exception e){
                 e.printStackTrace();
