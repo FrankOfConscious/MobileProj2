@@ -1,5 +1,5 @@
 # MobileProj2
-Project 2 of Mobile Computing: 
+Project 2 of Mobile Computing: \
 Using Eye Recognition &amp; Face recognition &amp; Azure FaceAPI, CosmosDB, VM
 
 # Driveroo
