@@ -51,9 +51,9 @@ public class EndActivity extends AppCompatActivity {
         greetTv = (TextView) findViewById(R.id.greetTv);
 
         rate1 = "Excellent! You are the boss!";
-        rate2 = "Good! You are a reliable driver!" ;
-        rate3 = "Not bad, focus more on the road!";
-        rate4 = "Umm.. do not get distracted when driving next time.";
+        rate2 = "Safe and sound!" ;
+        rate3 = "Focus more on the road!";
+        rate4 = "Lucky won't come every time!";
         Bundle extras = getIntent().getExtras();
         String timeText = extras.getString("time");
         String distanceText = extras.getString("distance");
@@ -114,7 +114,7 @@ public class EndActivity extends AppCompatActivity {
                 warningTv.setText(warningTime);
                 timeTv.setText(timeText);
                 distanceTv.setText(distanceText);
-                userTv.setText("Not bad mate, you could do better!");
+                userTv.setText("Not bad mate, you should concentrate more next time!");
                 break;
             case "C":
                 mView.setBackgroundColor(getResources().getColor(R.color.googleRed));
@@ -124,7 +124,7 @@ public class EndActivity extends AppCompatActivity {
                 warningTv.setText(warningTime);
                 timeTv.setText(timeText);
                 distanceTv.setText(distanceText);
-                userTv.setText("Take care mate, life is the first!");
+                userTv.setText("Take care mate, do not get distracted when driving next time,safety comes the first!");
                 break;
             default:
                 mView.setBackgroundColor(getResources().getColor(R.color.liamCyan));

@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final long INTERVAL_OND_SECOND = 1000;
 
     private String decimalPlaces = "80";
-    private int colors[] ={Color.parseColor("#ffe476"),Color.parseColor("#FF5C1C")};
+    private int colors[] ={Color.parseColor("#86FF59"),Color.parseColor("#FF5C1C")};//86FF59 //#ffe476
     private EditText editText;
     private ConstraintLayout rl;
     private TextView stateText;
@@ -114,29 +114,44 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         public void handleMessage(final Message msg) {
             int warning=msg.what;
-            if(warning>=3){
-                //currentTime=System.currentTimeMillis();
-
-                if(currentTime+5000<System.currentTimeMillis()){
-                    if(warning>=6){
-                        Toast.makeText(MainActivity.this, "Warning >= 6", Toast.LENGTH_SHORT).show();
-                        mplay2.start();
-                        currentTime=System.currentTimeMillis();
-                        mVib.vibrate(1000);
-                    }else{
-                        Toast.makeText(MainActivity.this, "Warning < 6", Toast.LENGTH_SHORT).show();
-                        mplay1.start();
-                        currentTime=System.currentTimeMillis();
-                        mVib.vibrate(1000);
-                    }
-                }
-
-            }
             int editLength=editText.getText().length();
             String level=editText.getText().toString();
             int offset=warning*10-editLength;
-            if(offset==0){}
+            if(offset==0){
+                if(warning>=3){
+                    //currentTime=System.currentTimeMillis();
+                    if(currentTime+5000<System.currentTimeMillis()){
+                        if(warning>=6){
+                            Toast.makeText(MainActivity.this, "Warning >= 6", Toast.LENGTH_SHORT).show();
+                            mplay2.start();
+                            currentTime=System.currentTimeMillis();
+                            mVib.vibrate(1000);
+                        }else{
+                            Toast.makeText(MainActivity.this, "Warning < 6", Toast.LENGTH_SHORT).show();
+                            mplay1.start();
+                            currentTime=System.currentTimeMillis();
+                            mVib.vibrate(1000);
+                        }
+                    }
+                }
+            }
             if(offset>0){
+                if(warning>=3){
+                    //currentTime=System.currentTimeMillis();
+                    if(currentTime+5000<System.currentTimeMillis()){
+                        if(warning>=6){
+                            Toast.makeText(MainActivity.this, "Warning >= 6", Toast.LENGTH_SHORT).show();
+                            mplay2.start();
+                            currentTime=System.currentTimeMillis();
+                            mVib.vibrate(1000);
+                        }else{
+                            Toast.makeText(MainActivity.this, "Warning < 6", Toast.LENGTH_SHORT).show();
+                            mplay1.start();
+                            currentTime=System.currentTimeMillis();
+                            mVib.vibrate(1000);
+                        }
+                    }
+                }
                 for(int i=0; i<offset;i++){
                     level+="w";
                     if(editText.getText().length()>80) break;
