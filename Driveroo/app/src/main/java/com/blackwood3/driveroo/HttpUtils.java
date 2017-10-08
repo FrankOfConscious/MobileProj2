@@ -30,35 +30,32 @@ public class HttpUtils {
          */
         JSONObject nullreturn = new JSONObject();
         byte[] data = getPOSTRequestData(params, encode).toString().getBytes();
-        URL url = new URL("http://192.168.1.107:5000/");
+        URL url = new URL("http://192.168.1.107:5001/");
         if (operation.equals("login")) {
-            url = new URL("http://192.168.1.107:5000/login");
+            url = new URL("http://192.168.1.107:5001/login");
         } else if (operation.equals("signup")) {
-            url = new URL("http://192.168.1.107:5000/signup");
+            url = new URL("http://192.168.1.107:5001/signup");
         }
         String doc2 = new String(data);
         Log.w("Input data", doc2);
         HttpURLConnection httpURLConnection = null;
         try {
             httpURLConnection = (HttpURLConnection) url.openConnection();
-            httpURLConnection.setConnectTimeout(3000);  // 设置连接超时时间
-            httpURLConnection.setDoInput(true);         // 打开输入流，以便从服务器获取数据
-            httpURLConnection.setDoOutput(true);        // 打开输出流，以便向服务器提交数据
-            httpURLConnection.setRequestMethod("POST"); // 设置以POST方式提交数据
-            httpURLConnection.setUseCaches(false);      // 使用POST方式不能使用缓存
-            // 设置请求体的类型是文本类型
+            httpURLConnection.setConnectTimeout(3000);
+            httpURLConnection.setDoInput(true);
+            httpURLConnection.setDoOutput(true);
+            httpURLConnection.setRequestMethod("POST");
+            httpURLConnection.setUseCaches(false);
             httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            // 设置请求体的长度
             httpURLConnection.setRequestProperty("Content-Length", String.valueOf(data.length));
-            // 获得输入流，向服务器写入数据
             OutputStream outputStream = new BufferedOutputStream(httpURLConnection.getOutputStream());
             outputStream.write(data);
-            outputStream.flush();                       // 重要！flush()之后才会写入
+            outputStream.flush();
 
-            int response = httpURLConnection.getResponseCode();     // 获得服务器响应码
+            int response = httpURLConnection.getResponseCode();
             if (response == HttpURLConnection.HTTP_OK) {
                 InputStream inputStream = httpURLConnection.getInputStream();
-                return dealResponseResult(inputStream);             // 处理服务器响应结果
+                return dealResponseResult(inputStream);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -73,22 +70,18 @@ public class HttpUtils {
         JSONObject nullreturn = new JSONObject();
         String url = new String();
         if(operation.equals("getProfile")){
-            url = "http://192.169.0.20:5000/getProfile?";
+            url = "http://192.168.1.107:5001/getProfile?";
             url += getGETRequestUrl(params,encode);
             Log.w("URL",url);
             URL obj = new URL(url);
             HttpURLConnection httpURLConnection = null;
             try{
                 httpURLConnection = (HttpURLConnection) obj.openConnection();
-                httpURLConnection.setRequestMethod("GET"); // 设置以POST方式提交数据
-//                httpURLConnection.setDoOutput(true);
-//                httpURLConnection.setDoInput(true);
-                // 设置请求体的类型是文本类型
-//                httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                int response = httpURLConnection.getResponseCode();     // 获得服务器响应码
+                httpURLConnection.setRequestMethod("GET");
+                int response = httpURLConnection.getResponseCode();
                 if (response == HttpURLConnection.HTTP_OK) {
                     InputStream inputStream = httpURLConnection.getInputStream();
-                    return dealResponseResult(inputStream);             // 处理服务器响应结果
+                    return dealResponseResult(inputStream);
                 }
 
             }catch (IOException e){
@@ -97,23 +90,59 @@ public class HttpUtils {
                 httpURLConnection.disconnect();
             }
 
-        }else if(operation.equals(("check_server"))){
-            url = "http://192.169.0.20:5000/check_server?";
+        }else if(operation.equals("check_server")){
+            url = "http://192.168.1.107:5001/check_server?";
             url += getGETRequestUrl(params,encode);
             Log.w("URL",url);
             URL obj = new URL(url);
             HttpURLConnection httpURLConnection = null;
             try{
                 httpURLConnection = (HttpURLConnection) obj.openConnection();
-                httpURLConnection.setRequestMethod("GET"); // 设置以POST方式提交数据
-//                httpURLConnection.setDoOutput(true);
-//                httpURLConnection.setDoInput(true);
-                // 设置请求体的类型是文本类型
-//                httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                int response = httpURLConnection.getResponseCode();     // 获得服务器响应码
+                httpURLConnection.setRequestMethod("GET");
+                int response = httpURLConnection.getResponseCode();
                 if (response == HttpURLConnection.HTTP_OK) {
                     InputStream inputStream = httpURLConnection.getInputStream();
-                    return dealResponseResult(inputStream);             // 处理服务器响应结果
+                    return dealResponseResult(inputStream);
+                }
+
+            }catch (IOException e){
+                e.printStackTrace();
+            }finally {
+                httpURLConnection.disconnect();
+            }
+        }else if(operation.equals("update_start")){
+            url = "http://192.168.1.107:5001/update_start?";
+            url += getGETRequestUrl(params,encode);
+            Log.w("URL",url);
+            URL obj = new URL(url);
+            HttpURLConnection httpURLConnection = null;
+            try{
+                httpURLConnection = (HttpURLConnection) obj.openConnection();
+                httpURLConnection.setRequestMethod("GET");
+                int response = httpURLConnection.getResponseCode();
+                if (response == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = httpURLConnection.getInputStream();
+                    return dealResponseResult(inputStream);
+                }
+
+            }catch (IOException e){
+                e.printStackTrace();
+            }finally {
+                httpURLConnection.disconnect();
+            }
+        } else if(operation.equals("update_end")){
+            url = "http://192.168.1.107:5001/update_end?";
+            url += getGETRequestUrl(params,encode);
+            Log.w("URL",url);
+            URL obj = new URL(url);
+            HttpURLConnection httpURLConnection = null;
+            try{
+                httpURLConnection = (HttpURLConnection) obj.openConnection();
+                httpURLConnection.setRequestMethod("GET");
+                int response = httpURLConnection.getResponseCode();
+                if (response == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = httpURLConnection.getInputStream();
+                    return dealResponseResult(inputStream);
                 }
 
             }catch (IOException e){
@@ -125,16 +154,8 @@ public class HttpUtils {
         return nullreturn;
     }
 
-
-    /**
-     * 封装请求体信息
-     *
-     * @param params 请求体内容
-     * @param encode 编码格式
-     * @return 请求体信息
-     */
     public static StringBuffer getPOSTRequestData(Map<String, String> params, String encode) {
-        StringBuffer stringBuffer = new StringBuffer();            //存储封装好的请求体信息
+        StringBuffer stringBuffer = new StringBuffer();
         try {
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 stringBuffer.append(entry.getKey())
@@ -142,7 +163,7 @@ public class HttpUtils {
                         .append(URLEncoder.encode(entry.getValue(), encode))
                         .append("&");
             }
-            stringBuffer.deleteCharAt(stringBuffer.length() - 1);   // 删除最后一个"&"
+            stringBuffer.deleteCharAt(stringBuffer.length() - 1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -158,19 +179,13 @@ public class HttpUtils {
                 extra.append(URLEncoder.encode(entry.getValue(), encode));
                 extra.append("&");
             }
-            extra.deleteCharAt(extra.length() - 1);   // 删除最后一个"&"
+            extra.deleteCharAt(extra.length() - 1);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return extra.toString();
     }
 
-    /**
-     * 处理服务器的响应结果（将输入流转换成字符串)
-     *
-     * @param inputStream 服务器的响应输入流
-     * @return 服务器响应结果字符串
-     */
     public static JSONObject dealResponseResult(InputStream inputStream) {
         String resultData = null;
         JSONObject nullreturn = new JSONObject();

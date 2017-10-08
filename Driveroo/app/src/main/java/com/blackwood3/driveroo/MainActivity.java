@@ -1,23 +1,32 @@
 package com.blackwood3.driveroo;
 
 import android.Manifest;
+import android.animation.ArgbEvaluator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Chronometer;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,11 +49,16 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import static android.R.attr.offset;
+import static android.R.id.edit;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -64,10 +78,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     double start_latitude, start_longitude;
     double end_latitude, end_longitude;
     private ArrayList<LatLng> points;
+    Boolean ifCheckServer = true;
     Polyline line;
 
     LocationManager locationManager;
-    TextView timeTv;
+    //TextView timeTv;
     TextView disTv;
     ImageView startBtn2;
     ImageView endBtn;
@@ -81,12 +96,64 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static LatLng previousLatlng;
     private static float totalDistance = 0;
     private static String distanceText;
+    MediaPlayer mplay1;
+    MediaPlayer mplay2;
+    Vibrator mVib;
 
 
     // variables below are used for chronometer.
     Context mainContext;
 
     private static final long INTERVAL_OND_SECOND = 1000;
+
+    private String decimalPlaces = "80";
+    private int colors[] ={Color.parseColor("#ffe476"),Color.parseColor("#FF5C1C")};
+    private EditText editText;
+    private ConstraintLayout rl;
+    private TextView stateText;
+    private int currentWarningLevel;
+    private long currentTime;
+
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(final Message msg) {
+            int warning=msg.what;
+            if(warning>=3){
+                //currentTime=System.currentTimeMillis();
+
+                if(currentTime+4000<System.currentTimeMillis()){
+                    if(warning>=6){
+                        Toast.makeText(MainActivity.this, "Warning >= 6", Toast.LENGTH_SHORT).show();
+                        mplay2.start();
+                        currentTime=System.currentTimeMillis();
+                        mVib.vibrate(1000);
+                    }else{
+                        Toast.makeText(MainActivity.this, "Warning < 6", Toast.LENGTH_SHORT).show();
+                        mplay1.start();
+                        currentTime=System.currentTimeMillis();
+                        mVib.vibrate(1000);
+                    }
+                }
+
+            }
+            int editLength=editText.getText().length();
+            String level=editText.getText().toString();
+            int offset=warning*10-editLength;
+            if(offset==0){}
+            if(offset>0){
+                for(int i=0; i<offset;i++){
+                    level+="w";
+                    if(editText.getText().length()>80) break;
+                }
+                 editText.setText(level);
+            }
+            if(offset<0){
+                if(editText.getText().length()+offset <=0) level="";
+                else level=level.substring(0,(editText.getText().length()+offset));
+                editText.setText(level);
+            }
+        }
+    };
 
 
     // start of the main function
@@ -109,6 +176,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        editText=(EditText)findViewById(R.id.level);
+        rl=(ConstraintLayout) findViewById(R.id.main_layout);
+        rl.setBackgroundColor(colors[0]);
+        mplay1=MediaPlayer.create(this,R.raw.warn1);
+        mplay2=MediaPlayer.create(this,R.raw.warn2);
+        mVib=(Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+        currentTime=System.currentTimeMillis();
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                int editSize = editText.getText().length();
+                //如果长度大于最大值就不变色了
+                if (editSize > Integer.valueOf(decimalPlaces))return;
+                //得到 当前所占百分比的渐变值
+                BigDecimal bigEs= BigDecimal.valueOf(editSize);
+                BigDecimal result = bigEs.divide(new BigDecimal(decimalPlaces), 8, RoundingMode.HALF_UP);
+                //颜色估值器
+                ArgbEvaluator evaluator = new ArgbEvaluator();
+                //得到背景渐变色
+                int evaluate = (int) evaluator.evaluate(result.floatValue(),colors[0],colors[1]);
+                rl.setBackgroundColor(evaluate);
+            }
+        });
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -118,13 +218,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mainContext = this;
 
-        timeTv = (TextView) findViewById(R.id.timeTv);
+        //timeTv = (TextView) findViewById(R.id.timeTv);
         disTv = (TextView) findViewById(R.id.disTv);
 
         startBtn2 = (ImageView) findViewById(R.id.startBtn2);
         endBtn = (ImageView) findViewById(R.id.endBtn);
-        TextView testString=(TextView) findViewById(R.id.testString);
-        testString.setText("put String in this place and it will show on screen");
+
         chronometer = (Chronometer) findViewById(R.id.chronometer);
 
         isRunning = false;
@@ -134,9 +233,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View view) {
 
                 // add something >
-
-
-
 
                 // add something <
 
@@ -150,12 +246,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     chronometer.start();
                     isRunning = true;
                     startBtn2.setImageResource(R.drawable.pausefinal2_meitu_6);
+                    ifCheckServer = true;
+
+                    new Thread(runnable_start).start();
+                    new Thread(runnable_warning).start();
                 } else {
                     // chronometer is running, and use following code to stop.
                     lastPause = SystemClock.elapsedRealtime();
                     chronometer.stop();
                     isRunning = false;
                     startBtn2.setImageResource(R.drawable.startfinal2_meitu_4);
+                    ifCheckServer = false;
+                    editText.setText("");
+                    new Thread(runnable_end).start();
                 }
             }
         });
@@ -163,23 +266,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         endBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!isRunning) {
-                    recordTime = lastPause - chronometer.getBase();
-                    recordTimeStr = String.valueOf(recordTime);
-                    Toast.makeText(MainActivity.this, recordTimeStr, Toast.LENGTH_SHORT).show();
-                } else {
-                    recordTime = SystemClock.elapsedRealtime() - chronometer.getBase();
-                    recordTimeStr = String.valueOf(recordTime);
-                    Toast.makeText(MainActivity.this, recordTimeStr, Toast.LENGTH_SHORT).show();
+//                if (!isRunning) {
+//                    recordTime = lastPause - chronometer.getBase();
+//                    recordTimeStr = String.valueOf(recordTime);
+//                    Toast.makeText(MainActivity.this, recordTimeStr, Toast.LENGTH_SHORT).show();
+//                } else {
+//                    recordTime = SystemClock.elapsedRealtime() - chronometer.getBase();
+//                    recordTimeStr = String.valueOf(recordTime);
+//                    Toast.makeText(MainActivity.this, recordTimeStr, Toast.LENGTH_SHORT).show();
+//                }
+                if(isRunning){
+                    ifCheckServer = false;
+                    new Thread(runnable_end).start();
                 }
             }
         });
+       //*************************************
 
-        new Thread(runnable).start();
    }
 
 
-    Runnable runnable = new Thread(new Runnable() {
+    Runnable runnable_warning = new Thread(new Runnable() {
 
         public void run() {
             Intent intent = getIntent();
@@ -187,52 +294,82 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             String username = intent.getStringExtra(Intent.EXTRA_TEXT);
             Map<String, String> params = new HashMap<String, String>();
             params.put("username", username);
+            int warningLevel=0;
 
             while(true){
                 try {
-
-                    get_result = HttpUtils.submitGETData(params, "utf-8", "check_server");
-                    try {
-                        String info = get_result.getString("info");
-                        Log.w("Info",info);
-                        JSONObject result = new JSONObject(info);
-                        final Boolean warning = Boolean.valueOf(result.getString("ifWarning"));
-                        final Boolean recovery = Boolean.valueOf(result.getString("ifRecovery"));
-                        try{
-
+                    if(ifCheckServer){
+                        get_result = HttpUtils.submitGETData(params, "utf-8", "check_server");
+                        try {
+                            String info = get_result.getString("info");
+                            Log.w("Info",info);
+                            JSONObject result = new JSONObject(info);
+                            final Boolean warning = Boolean.valueOf(result.getString("ifWarning"));
+                            final Boolean recovery = Boolean.valueOf(result.getString("ifRecovery"));
+                            final Boolean ifStart = Boolean.valueOf(result.getString("ifStart"));
+                            final Boolean isNoWarning=!(warning ||recovery);
+                            if(warning) warningLevel=Math.min(warningLevel+1,8);
+                            if(recovery) warningLevel=Math.max(0,warningLevel-1);
+                            if(isNoWarning) warningLevel=Math.max(0,warningLevel-1);
+                            Message msg= new Message();
+                            msg.what=warningLevel;
+                            handler.sendMessage(msg);
                             Thread.sleep(2000);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if(warning && !recovery){
-                                        TextView testString=(TextView) findViewById(R.id.testString);
-                                        testString.setText("Warning");
-                                    }else if(!warning && recovery){
-                                        TextView testString=(TextView) findViewById(R.id.testString);
-                                        testString.setText("Recovery");
-                                    }else{
-                                        TextView testString=(TextView) findViewById(R.id.testString);
-                                        testString.setText("No Warning");
-                                    }
-                                }
-                            });
-                        } catch (InterruptedException e){
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    }else{
+                        Log.w("Thread interrupt","True");
+                        Thread.interrupted();
+                        break;
                     }
+
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }
             }
 
+
+
         }
     }
     );
+    Runnable runnable_start = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            Intent intent = getIntent();
+            String username = intent.getStringExtra(Intent.EXTRA_TEXT);
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("username", username);
+            try{
+                HttpUtils.submitGETData(params, "utf-8", "update_start");
+            }catch (MalformedURLException e){
+                e.printStackTrace();
+            }
+
+        }
+    });
+
+    Runnable runnable_end = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            Intent intent = getIntent();
+            JSONObject get_result = null;
+            String username = intent.getStringExtra(Intent.EXTRA_TEXT);
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("username", username);
+            try{
+                HttpUtils.submitGETData(params, "utf-8", "update_end");
+            }catch (MalformedURLException e){
+                e.printStackTrace();
+            }
+
+        }
+    });
 
 
-   @Override
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch(requestCode)
         {
@@ -267,7 +404,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
            buildGoogleApiClient();
            mMap.setMyLocationEnabled(true);
        }
-
+        Toast.makeText(MainActivity.this, "in onmapready", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -362,8 +499,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         totalDistance += result[0];
         float showDistance = totalDistance;
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
-        distanceText = "Distance: ";
+        distanceText = "";
         distanceText += decimalFormat.format(showDistance);
+        distanceText+=" km";
 
         disTv.setText(distanceText);
         previousLatlng = latLng;

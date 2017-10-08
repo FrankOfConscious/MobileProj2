@@ -139,7 +139,7 @@ public class SignUpActivity extends AppCompatActivity {
                                System.currentTimeMillis()>=timeFlag ) break;
                     }
                     isEmailValid=success;
-                    if(email.equals("y@y.y")||isEmailValid){
+                    if(email.equals("y@y.y")||success){
                         Toast.makeText(SignUpActivity.this, "Successfully signed up!", Toast.LENGTH_SHORT).show();
                         Intent jumpToLogin= new Intent(getApplicationContext(), LoginActivity.class);
                         startActivity(jumpToLogin);
