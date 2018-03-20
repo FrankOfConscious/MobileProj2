@@ -9,3 +9,5 @@ Cloud: using Azure FaceAPI, CosmosDB, VM
 3. There is an operation README.txt inside of backend folder.
 
 # Enjoy you day and keep safe!
+Video demo:
+https://www.youtube.com/watch?v=i5nLrtndNn0
